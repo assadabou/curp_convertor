@@ -44,7 +44,11 @@ export default async function handler(
     const { rows } = req.body as ConversionRequest;
 
     if (!rows || !Array.isArray(rows) || rows.length === 0) {
-      return res.status(400).json({ error: 'Invalid request: rows array is required' });
+      return res.status(400).json({ 
+        error: 'Invalid request: rows array is required',
+        message: 'The request body must contain a "rows" array with CSV data',
+        details: `Received: ${typeof rows}, Array: ${Array.isArray(rows)}, Length: ${rows?.length || 0}`
+      });
     }
 
     const results: ConversionResult[] = [];
@@ -68,7 +72,7 @@ export default async function handler(
         );
 
         if (!parsedName.firstName) {
-          result.error = 'Could not parse name';
+          result.error = `Could not parse name "${row.full_name}". Please ensure the name contains at least a first name and surname.`;
           result.generated_curp = '';
           result.rfc = '';
           results.push(result);
@@ -98,7 +102,7 @@ export default async function handler(
         const curpData = extractDataFromCURP(row.curp);
         
         if (!curpData) {
-          result.error = 'Invalid CURP format - could not extract data';
+          result.error = `Invalid CURP format - could not extract data from "${row.curp}". CURP must be 18 characters with valid structure.`;
           result.generated_curp = '';
           result.rfc = '';
           results.push(result);
@@ -110,7 +114,12 @@ export default async function handler(
         const state = curpData.state || '';
 
         if (!birthDate || !sex || !state) {
-          result.error = 'Incomplete data in CURP';
+          const missing = [];
+          if (!birthDate) missing.push('birth date');
+          if (!sex) missing.push('sex');
+          if (!state) missing.push('state');
+          
+          result.error = `Incomplete data in CURP "${row.curp}": missing ${missing.join(', ')}. Please verify CURP structure.`;
           result.generated_curp = '';
           result.rfc = '';
           results.push(result);
@@ -168,13 +177,16 @@ export default async function handler(
 
         results.push(result);
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`Error processing row with full_name "${row.full_name}", curp "${row.curp}":`, error);
+        
         results.push({
           ...Object.fromEntries(
             Object.entries(row).map(([key, value]) => [key, value || ''])
           ),
           generated_curp: '',
           rfc: '',
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: `Processing error: ${errorMessage}. Please check the data format and try again.`,
         });
       }
     }
@@ -182,9 +194,21 @@ export default async function handler(
     return res.status(200).json({ results });
   } catch (error) {
     console.error('Error processing request:', error);
+    
+    // Provide detailed error information
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
     return res.status(500).json({ 
       error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? errorStack : 'Enable development mode for detailed error information',
+      timestamp: new Date().toISOString(),
+      requestInfo: {
+        method: req.method,
+        url: req.url,
+        bodySize: JSON.stringify(req.body).length
+      }
     });
   }
 }

@@ -61,7 +61,28 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to process CSV');
+        let errorMessage = `Failed to process CSV (HTTP ${response.status}: ${response.statusText})`;
+        
+        try {
+          const errorData = await response.json();
+          if (errorData.error) {
+            errorMessage += ` - ${errorData.error}`;
+          }
+          if (errorData.message) {
+            errorMessage += ` - ${errorData.message}`;
+          }
+          if (errorData.details) {
+            errorMessage += ` - Details: ${errorData.details}`;
+          }
+        } catch (parseError) {
+          // If we can't parse the error response, include the raw response
+          const responseText = await response.text().catch(() => 'Unable to read response');
+          if (responseText && responseText !== 'Unable to read response') {
+            errorMessage += ` - Response: ${responseText.substring(0, 200)}${responseText.length > 200 ? '...' : ''}`;
+          }
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -80,7 +101,30 @@ export default function Home() {
       const successCount = data.results.filter((r: ConversionResult) => !r.error || r.error === '').length;
       setSuccessMessage(`Successfully processed ${successCount}/${data.results.length} rows. CSV downloaded.`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      let errorMessage = 'An error occurred while processing the CSV';
+      
+      if (err instanceof Error) {
+        errorMessage = err.message;
+        
+        // Add more context for common errors
+        if (err.message.includes('CSV parsing error')) {
+          errorMessage += ' - Please check that your file is a valid CSV format with proper headers';
+        } else if (err.message.includes('CURP')) {
+          errorMessage += ' - Please verify that your CURP values are valid 18-character codes';
+        } else if (err.message.includes('full_name')) {
+          errorMessage += ' - Ensure your CSV has a "full_name" column with complete names';
+        } else if (err.message.includes('No valid data')) {
+          errorMessage += ' - Make sure your CSV has the required columns: full_name, curp';
+        } else if (err.message.includes('413') || err.message.includes('Payload Too Large')) {
+          errorMessage += ' - Your CSV file is too large. Try splitting it into smaller files (under 50MB)';
+        } else if (err.message.includes('500') || err.message.includes('Internal server error')) {
+          errorMessage += ' - Server processing error. Please try again or contact support if the issue persists';
+        } else if (err.message.includes('timeout')) {
+          errorMessage += ' - Request timed out. Try with a smaller CSV file or try again later';
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

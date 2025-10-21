@@ -71,7 +71,22 @@ export default function TimestampConverter() {
         `Successfully converted ${successCount}/${convertedResults.length} timestamps. CSV downloaded.`
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      let errorMessage = 'An error occurred while processing the CSV';
+      
+      if (err instanceof Error) {
+        errorMessage = err.message;
+        
+        // Add more context for common errors
+        if (err.message.includes('CSV parsing error')) {
+          errorMessage += ' - Please check that your file is a valid CSV format';
+        } else if (err.message.includes('timestamp')) {
+          errorMessage += ' - Please verify that your timestamp column contains valid date/time values';
+        } else if (err.message.includes('No valid data')) {
+          errorMessage += ' - Ensure your CSV has the required columns: identifier, ip_address, privacy_notice_url, timestamp';
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
