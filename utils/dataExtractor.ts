@@ -412,7 +412,7 @@ export function extractCompleteCURPData(curp: string): CompleteCURPData | null {
 
   return {
     ...basicData,
-    nameHints
+    nameHints: nameHints || undefined
   };
 }
 
