@@ -78,12 +78,15 @@ export function parseCsvFile(file: File): Promise<ParsedCsvData> {
               return;
             }
 
-            // Add row with all original columns preserved
-            rows.push({
-              full_name: fullName.trim(),
-              curp: curp.trim().toUpperCase(),
-              ...row // Preserve all original columns
-            });
+            // Create a clean row with all original columns preserved
+            // First spread all original columns, then override with our processed values
+            const cleanRow: CsvInputRow = {
+              ...row, // Preserve all original columns first
+              full_name: fullName.trim(), // Override with processed full_name
+              curp: curp.trim().toUpperCase(), // Override with processed curp
+            };
+            
+            rows.push(cleanRow);
           } catch (error) {
             errors.push(`Row ${index + 2}: Error parsing row - ${error instanceof Error ? error.message : 'Unknown error'}`);
           }

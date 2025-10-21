@@ -100,6 +100,8 @@ Your CSV file must include these columns (column names are case-insensitive):
 - **full_name**: Full name in Spanish format (e.g., "Miguel Arroyo De La Cruz")
 - **curp**: Valid CURP (18 characters)
 
+**Additional Columns**: Any extra columns in your CSV (employee_id, department, email, salary, etc.) will be automatically preserved and included in the output file.
+
 **That's it!** The system automatically extracts:
 - ✅ Birth date from CURP (positions 4-9)
 - ✅ Sex from CURP (position 10: H/M)
@@ -131,25 +133,36 @@ Your CSV file must include these columns:
 
 #### CURP & RFC Generator Input
 
+**Basic Format (minimum required):**
 ```csv
 full_name,curp
 MIGUEL ARROYO DE LA CRUZ,AACM910503HVZRRG09
 MARIA JOSE GARCIA LOPEZ,GALM850615MDFRRR08
-JUAN CARLOS MARTINEZ HERNANDEZ,MAHJ920320HNLRRR05
-ANA MARIA RODRIGUEZ SANCHEZ,ROSA880512MJCRRR03
-JOSE DE LOS SANTOS PEREZ,SAPJ751225HGTRRR01
-MARIA DEL CARMEN LOPEZ GARCIA,LOGM901010MMCRRR09
-PEDRO GONZALEZ MARTINEZ,GOMP850615HVZRRR02
 ```
 
-**Note:** Only two columns required! Everything else is extracted from the CURP automatically.
+**With Additional Columns (all preserved in output):**
+```csv
+full_name,curp,employee_id,department,salary,hire_date,email,phone
+MIGUEL ARROYO DE LA CRUZ,AACM910503HVZRRG09,EMP001,IT,75000,2020-01-15,miguel.arroyo@company.com,555-0101
+MARIA JOSE GARCIA LOPEZ,GALM850615MDFRRR08,EMP002,HR,65000,2019-03-10,maria.garcia@company.com,555-0102
+```
+
+**Note:** Only `full_name` and `curp` columns are required! All additional columns are preserved in the output, and birth date, sex, and state are extracted from the CURP automatically.
 
 #### CURP & RFC Generator Output
 
+**Basic Output:**
 ```csv
 full_name,curp,generated_curp,rfc,name_validation,error
 MIGUEL ARROYO DE LA CRUZ,AACM910503HVZRRG09,AACM910503HVZRRG09,AACM9105039,VALIDATED,
 MARIA JOSE GARCIA LOPEZ,GALM850615MDFRRR08,GALM850615MDFRRR08,GALM850615AB3,VALIDATED,
+```
+
+**With Additional Columns (all preserved):**
+```csv
+full_name,curp,employee_id,department,salary,hire_date,email,phone,generated_curp,rfc,name_validation,error
+MIGUEL ARROYO DE LA CRUZ,AACM910503HVZRRG09,EMP001,IT,75000,2020-01-15,miguel.arroyo@company.com,555-0101,AACM910503HVZRRG09,AACM9105039,VALIDATED,
+MARIA JOSE GARCIA LOPEZ,GALM850615MDFRRR08,EMP002,HR,65000,2019-03-10,maria.garcia@company.com,555-0102,GALM850615MDFRRR08,GALM850615AB3,VALIDATED,
 ```
 
 **New Columns:**

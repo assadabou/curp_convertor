@@ -161,19 +161,22 @@ export default function Home() {
                   {csvFile ? csvFile.name : 'Choose CSV file'}
                 </label>
               </div>
-              <div className={styles.hint}>
-                <p><strong>Required CSV columns:</strong></p>
-                <ul style={{ textAlign: 'left', marginTop: '8px' }}>
-                  <li><strong>full_name</strong>: Full name (e.g., "Miguel Arroyo De La Cruz")</li>
-                  <li><strong>curp</strong>: Valid CURP (18 characters)</li>
-                </ul>
-                <p style={{ marginTop: '12px', fontSize: '0.9em' }}>
-                  The system uses intelligent name parsing with CURP validation to accurately split names into components. Birth date, sex, and state are automatically extracted from the CURP.
-                </p>
-                <p style={{ marginTop: '8px', fontSize: '0.85em', fontStyle: 'italic' }}>
-                  💡 CURP Intelligence: The system validates your name parsing against CURP structure for maximum accuracy!
-                </p>
-              </div>
+        <div className={styles.hint}>
+          <p><strong>Required CSV columns:</strong></p>
+          <ul style={{ textAlign: 'left', marginTop: '8px' }}>
+            <li><strong>full_name</strong>: Full name (e.g., "Miguel Arroyo De La Cruz")</li>
+            <li><strong>curp</strong>: Valid CURP (18 characters)</li>
+          </ul>
+          <p style={{ marginTop: '12px', fontSize: '0.9em' }}>
+            The system uses intelligent name parsing with CURP validation to accurately split names into components. Birth date, sex, and state are automatically extracted from the CURP.
+          </p>
+          <p style={{ marginTop: '8px', fontSize: '0.85em', fontStyle: 'italic' }}>
+            💡 CURP Intelligence: The system validates your name parsing against CURP structure for maximum accuracy!
+          </p>
+          <p style={{ marginTop: '8px', fontSize: '0.85em', color: '#666' }}>
+            📋 <strong>Additional Columns:</strong> Any extra columns in your CSV (employee_id, department, email, etc.) will be preserved and included in the output file.
+          </p>
+        </div>
               <button
                 type="submit"
                 className={styles.button}
