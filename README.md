@@ -28,6 +28,26 @@ A modern web application with two main tools:
 - **Error Handling**: Comprehensive error handling and user feedback
 - **Easy Navigation**: Switch between tools with simple navigation
 
+## Documentation
+
+📚 **[COMPLETE_CURP_RFC_GUIDE.md](./COMPLETE_CURP_RFC_GUIDE.md)** - **ONE unified comprehensive guide** with everything about CURP/RFC
+
+### What's Inside
+
+- ✅ Complete CURP & RFC structures
+- ✅ Full 9-step conversion algorithm  
+- ✅ Intelligent name parsing (5 strategies)
+- ✅ Data dependency analysis
+- ✅ Character mapping tables
+- ✅ 4+ complete worked examples
+- ✅ Performance metrics
+- ✅ Real-world usage examples
+
+### Additional Guides
+
+- **[Timestamp Converter Guide](./TIMESTAMP_CONVERTER_GUIDE.md)** - Timestamp conversion details
+- **[Documentation Index](./DOCUMENTATION_INDEX.md)** - Navigation and structure guide
+
 ## Tech Stack
 
 - **Framework**: Next.js 14 with TypeScript
